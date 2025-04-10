@@ -71,7 +71,7 @@ statement:
     ;
 
 block_statement:
-    BEGIN_TOKEN statement_list END_TOKEN SEMICOLON
+    BEGIN_TOKEN statement_list END_TOKEN 
     ;
 
 assignment_statement:
@@ -111,16 +111,16 @@ scan_args:
 
 if_statement:
     IF LPAREN condition RPAREN block_statement
-    | IF LPAREN condition RPAREN block_statement ELSE block_statement
+    | IF LPAREN condition RPAREN block_statement ELSE block_statement SEMICOLON
     ;
 
 while_statement:
-    WHILE LPAREN condition RPAREN block_statement
+    WHILE LPAREN condition RPAREN block_statement SEMICOLON
     ;
 
 for_statement:
-    FOR IDENTIFIER ASSIGN expression TO expression INC expression DO block_statement
-    | FOR IDENTIFIER ASSIGN expression TO expression DEC expression DO block_statement
+    FOR IDENTIFIER ASSIGN expression TO expression INC expression DO block_statement SEMICOLON
+    | FOR IDENTIFIER ASSIGN expression TO expression DEC expression DO block_statement SEMICOLON
     ;
 
 condition:
