@@ -1,0 +1,12 @@
+begin program:
+begin VarDecl:
+(number, int);
+(sum, int);
+(a, int);
+(b, int);
+(arr[(6,10)], int);
+end VarDecl
+number := (3, 10);
+sum := (0, 10);
+b := (20, 10);
+end program
