@@ -106,7 +106,7 @@ scan_args:
     ;
 
 if_statement:
-    IF LPAREN condition RPAREN block_statement
+    IF LPAREN condition RPAREN block_statement SEMICOLON
     | IF LPAREN condition RPAREN block_statement ELSE block_statement SEMICOLON
     ;
 
