@@ -85,7 +85,7 @@ ID         [a-zA-Z_][a-zA-Z_0-9]*
         return DECIMAL;
     }
     /* Handle error case if format is incorrect */
-    yyerror("Invalid decimal format");
+    printf("Invalid decimal format");
 }
 
 {BINARY}     {
@@ -109,7 +109,7 @@ ID         [a-zA-Z_][a-zA-Z_0-9]*
         return BINARY;
     }
     /* Handle error case if format is incorrect */
-    yyerror("Invalid binary format");
+    printf("Invalid binary format");
 }
 
 {OCTAL}      {
@@ -133,7 +133,7 @@ ID         [a-zA-Z_][a-zA-Z_0-9]*
         return OCTAL;
     }
     /* Handle error case if format is incorrect */
-    yyerror("Invalid octal format");
+    printf("Invalid octal format");
 }
 
 \'[^\']\'                       {
