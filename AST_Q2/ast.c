@@ -239,8 +239,10 @@ void print_ast(ASTNode* node, int indent) {
         case PRINT_NODE:
             printf("(print ");
             print_ast(node->data.io_stmt.format_str, indent);
-            printf(" ");
-            print_ast(node->data.io_stmt.args_list, indent);
+            if (node->data.io_stmt.args_list != NULL) {
+                printf(" ");
+                print_ast(node->data.io_stmt.args_list, indent);
+            }
             printf(")");
             break;
         case SCAN_NODE:

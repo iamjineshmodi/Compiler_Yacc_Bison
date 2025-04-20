@@ -1,6 +1,6 @@
 from nltk.tree import *
 
-text = "( ( (x int) ( (y int) ( (z int) (binaryval int) ) ) ) ( (:= x (10 10)) ( (:= y (11 10)) ( (:= z (+ x y)) ( (print ""Sum = @"" z) ( (:= binaryval (1010 2)) (print ""Binary value = @"" binaryval) ) ) ) ) ) )"
+text = "(((number int) ((sum int) ((a int) ((b int) (arr[11] int))))) ((:= number (3 10)) ((:= sum (0 10)) (:= b (20 10)))))"
 tree = Tree.fromstring(text)
 tree.pretty_print(unicodelines=True, nodedist=1)
 
