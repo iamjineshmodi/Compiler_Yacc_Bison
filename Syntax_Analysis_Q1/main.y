@@ -111,7 +111,7 @@ if_statement:
     ;
 
 while_statement:
-    WHILE LPAREN condition RPAREN block_statement SEMICOLON
+    WHILE LPAREN condition RPAREN DO block_statement SEMICOLON
     ;
 
 for_statement:
