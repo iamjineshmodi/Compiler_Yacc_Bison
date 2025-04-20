@@ -6,9 +6,9 @@ extern int line_num;
 
 %}
 
-DIGIT      [0-9]
-BINARY     0b[01]+
-OCTAL      0o[0-7]+
+DECIMAL     \(([0]|[1-9][0-9]*),[ ]*10\)
+BINARY      \([0-1]+,[ ]*2\)
+OCTAL       \([0-7]+,[ ]*8\)
 ID         [a-zA-Z_][a-zA-Z_0-9]*
 
 %%
@@ -67,23 +67,72 @@ ID         [a-zA-Z_][a-zA-Z_0-9]*
                                   return STRING;
                                 }
 
-{BINARY}                        {
-                                  yylval.intval.value = strtol(yytext+2, NULL, 2);
-                                  yylval.intval.base = 2;
-                                  return BINARY;
-                                }
+{DECIMAL}    { 
+    /* Extract number and base from the format (number,10) */
+    char *number_str = strdup(yytext);
+    number_str++; /* Skip the opening parenthesis */
+    
+    char *comma_pos = strchr(number_str, ',');
+    if (comma_pos) {
+        *comma_pos = '\0'; /* Null-terminate at the comma */
+        
+        /* Parse the number part */
+        yylval.intval.value = atoi(number_str);
+        yylval.intval.base = 10;
+        
+        return DECIMAL;
+    }
+    /* Handle error case if format is incorrect */
+    yyerror("Invalid decimal format");
+}
 
-{OCTAL}                         {
-                                  yylval.intval.value = strtol(yytext+2, NULL, 8);
-                                  yylval.intval.base = 8;
-                                  return OCTAL;
-                                }
+{BINARY}     {
+    /* Extract number and base from the format (number,2) */
+    char *number_str = strdup(yytext);
+    number_str++; /* Skip the opening parenthesis */
+    
+    char *comma_pos = strchr(number_str, ',');
+    if (comma_pos) {
+        *comma_pos = '\0'; /* Null-terminate at the comma */
+        
+        /* Parse binary number (convert from base 2 to decimal) */
+        int value = 0;
+        for (int i = 0; number_str[i] != '\0'; i++) {
+            value = value * 2 + (number_str[i] - '0');
+        }
+        
+        yylval.intval.value = value;
+        yylval.intval.base = 2;
+        
+        return BINARY;
+    }
+    /* Handle error case if format is incorrect */
+    yyerror("Invalid binary format");
+}
 
-{DIGIT}+                        {
-                                  yylval.intval.value = atoi(yytext);
-                                  yylval.intval.base = 10;
-                                  return DECIMAL;
-                                }
+{OCTAL}      {
+    /* Extract number and base from the format (number,8) */
+    char *number_str = strdup(yytext);
+    number_str++; /* Skip the opening parenthesis */
+    
+    char *comma_pos = strchr(number_str, ',');
+    if (comma_pos) {
+        *comma_pos = '\0'; /* Null-terminate at the comma */
+        
+        /* Parse octal number (convert from base 8 to decimal) */
+        int value = 0;
+        for (int i = 0; number_str[i] != '\0'; i++) {
+            value = value * 8 + (number_str[i] - '0');
+        }
+        
+        yylval.intval.value = value;
+        yylval.intval.base = 8;
+        
+        return OCTAL;
+    }
+    /* Handle error case if format is incorrect */
+    yyerror("Invalid octal format");
+}
 
 \'[^\']\'                       {
                                   yylval.ch = yytext[1];

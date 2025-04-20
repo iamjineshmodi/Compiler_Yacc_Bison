@@ -46,7 +46,7 @@ ASTNode* root = NULL;
 %type <ast> program var_decl_section var_decl_list var_decl statement_list statement
 %type <ast> assignment_stmt expression term factor constant
 %type <ast> if_stmt while_stmt for_stmt print_stmt scan_stmt block
-%type <ast>  print_arg_list scan_arg_list
+%type <ast> print_arg_list scan_arg_list array_decl
 
 %%
 
@@ -77,9 +77,22 @@ var_decl:
         { $$ = create_var_decl_node($2, $4, 0); }
     | LPAREN IDENTIFIER COMMA CHAR RPAREN SEMICOLON
         { $$ = create_var_decl_node($2, $4, 0); }
-    | LPAREN IDENTIFIER LBRACKET DECIMAL RBRACKET COMMA INT RPAREN SEMICOLON
+    | array_decl
+        { $$ = $1; }
+    ;
+
+array_decl:
+    LPAREN IDENTIFIER LBRACKET DECIMAL RBRACKET COMMA INT RPAREN SEMICOLON
+        { $$ = create_var_decl_node($2, $7, $4.value); }
+    | LPAREN IDENTIFIER LBRACKET BINARY RBRACKET COMMA INT RPAREN SEMICOLON
+        { $$ = create_var_decl_node($2, $7, $4.value); }
+    | LPAREN IDENTIFIER LBRACKET OCTAL RBRACKET COMMA INT RPAREN SEMICOLON
         { $$ = create_var_decl_node($2, $7, $4.value); }
     | LPAREN IDENTIFIER LBRACKET DECIMAL RBRACKET COMMA CHAR RPAREN SEMICOLON
+        { $$ = create_var_decl_node($2, $7, $4.value); }
+    | LPAREN IDENTIFIER LBRACKET BINARY RBRACKET COMMA CHAR RPAREN SEMICOLON
+        { $$ = create_var_decl_node($2, $7, $4.value); }
+    | LPAREN IDENTIFIER LBRACKET OCTAL RBRACKET COMMA CHAR RPAREN SEMICOLON
         { $$ = create_var_decl_node($2, $7, $4.value); }
     ;
 
@@ -142,7 +155,9 @@ factor:
     ;
 
 constant:
-    LPAREN DECIMAL COMMA DECIMAL RPAREN { $$ = create_int_const_node($2.value, $4.value); }
+    DECIMAL { $$ = create_int_const_node($1.value, $1.base); }
+    | BINARY { $$ = create_int_const_node($1.value, $1.base); }
+    | OCTAL { $$ = create_int_const_node($1.value, $1.base); }
     | CHAR_CONST { $$ = create_char_const_node($1); }
     ;
 
@@ -154,8 +169,8 @@ if_stmt:
     ;
 
 while_stmt:
-    WHILE LPAREN expression RPAREN block SEMICOLON
-        { $$ = create_while_node($3, $5); }
+    WHILE LPAREN expression RPAREN DO block SEMICOLON
+        { $$ = create_while_node($3, $6); }
     ;
 
 for_stmt:
