@@ -5,6 +5,7 @@
 extern int line_num;
 
 %}
+COMMENT     \/\*([^*]|\*+[^*/])*\*+\/|\/\/.*
 
 DECIMAL     \(([0]|[1-9][0-9]*),[ ]*10\)
 BINARY      \([0-1]+,[ ]*2\)
@@ -12,6 +13,7 @@ OCTAL       \([0-7]+,[ ]*8\)
 ID         [a-zA-Z_][a-zA-Z_0-9]*
 
 %%
+{COMMENT}                         { }
 
 "begin"                         { return BEGIN_TOK; }
 "end"                           { return END_TOK; }
