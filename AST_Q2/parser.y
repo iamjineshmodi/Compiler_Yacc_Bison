@@ -65,12 +65,15 @@ var_decl_section:
     ;
 
 var_decl_list:
-      var_decl { $$ = $1; }
-    | var_decl var_decl_list { $$ = create_list_node($1, $2); }
+    var_decl { $$ = $1; }
+    | var_decl var_decl_list { 
+        // This creates a right-nested structure for variable declarations
+        $$ = create_list_node($1, $2); 
+    }
     ;
 
 var_decl:
-      LPAREN IDENTIFIER COMMA INT RPAREN SEMICOLON
+    LPAREN IDENTIFIER COMMA INT RPAREN SEMICOLON
         { $$ = create_var_decl_node($2, $4, 0); }
     | LPAREN IDENTIFIER COMMA CHAR RPAREN SEMICOLON
         { $$ = create_var_decl_node($2, $4, 0); }
@@ -81,21 +84,24 @@ var_decl:
     ;
 
 statement_list:
-      statement { $$ = $1; }
-    | statement statement_list { $$ = create_list_node($1, $2); }
+    statement { $$ = $1; }
+    | statement statement_list { 
+        // This creates a right-nested structure for statements
+        $$ = create_list_node($1, $2); 
+    }
     ;
 
 statement:
-      assignment_stmt { $$ = $1; }
-    | if_stmt         { $$ = $1; }
-    | while_stmt      { $$ = $1; }
-    | for_stmt        { $$ = $1; }
-    | print_stmt      { $$ = $1; }
-    | scan_stmt       { $$ = $1; }
+    assignment_stmt { $$ = $1; }
+    | if_stmt       { $$ = $1; }
+    | while_stmt    { $$ = $1; }
+    | for_stmt      { $$ = $1; }
+    | print_stmt    { $$ = $1; }
+    | scan_stmt     { $$ = $1; }
     ;
 
 assignment_stmt:
-      IDENTIFIER ASSIGN expression SEMICOLON
+    IDENTIFIER ASSIGN expression SEMICOLON
         { $$ = create_assign_node(create_identifier_node($1), $3, ASSIGN); }
     | IDENTIFIER PLUS_ASSIGN expression SEMICOLON
         { $$ = create_assign_node(create_identifier_node($1), $3, PLUS_ASSIGN); }
@@ -110,7 +116,7 @@ assignment_stmt:
     ;
 
 expression:
-      term { $$ = $1; }
+    term { $$ = $1; }
     | expression PLUS term  { $$ = create_binary_op_node($1, $3, PLUS); }
     | expression MINUS term { $$ = create_binary_op_node($1, $3, MINUS); }
     | expression GT term    { $$ = create_binary_op_node($1, $3, GT); }
@@ -122,26 +128,26 @@ expression:
     ;
 
 term:
-      factor { $$ = $1; }
+    factor { $$ = $1; }
     | term MULT factor { $$ = create_binary_op_node($1, $3, MULT); }
     | term DIV factor  { $$ = create_binary_op_node($1, $3, DIV); }
     | term MOD factor  { $$ = create_binary_op_node($1, $3, MOD); }
     ;
 
 factor:
-      IDENTIFIER { $$ = create_identifier_node($1); }
+    IDENTIFIER { $$ = create_identifier_node($1); }
     | constant   { $$ = $1; }
     | LPAREN expression RPAREN { $$ = $2; }
     | MINUS factor %prec UMINUS { $$ = create_binary_op_node(create_int_const_node(0, 10), $2, MINUS); }
     ;
 
 constant:
-      LPAREN DECIMAL COMMA DECIMAL RPAREN { $$ = create_int_const_node($2.value, $4.value); }
+    LPAREN DECIMAL COMMA DECIMAL RPAREN { $$ = create_int_const_node($2.value, $4.value); }
     | CHAR_CONST { $$ = create_char_const_node($1); }
     ;
 
 if_stmt:
-      IF LPAREN expression RPAREN block SEMICOLON
+    IF LPAREN expression RPAREN block SEMICOLON
         { $$ = create_if_node($3, $5, NULL); }
     | IF LPAREN expression RPAREN block ELSE block SEMICOLON
         { $$ = create_if_node($3, $5, $7); }
@@ -153,7 +159,7 @@ while_stmt:
     ;
 
 for_stmt:
-      FOR IDENTIFIER ASSIGN expression TO expression INC expression DO block SEMICOLON
+    FOR IDENTIFIER ASSIGN expression TO expression INC expression DO block SEMICOLON
         {
             ASTNode* init = create_assign_node(create_identifier_node($2), $4, ASSIGN);
             $$ = create_for_node(init, $6, $8, INC, $10);
@@ -166,32 +172,35 @@ for_stmt:
     ;
 
 print_stmt:
-      PRINT LPAREN STRING RPAREN SEMICOLON
+    PRINT LPAREN STRING RPAREN SEMICOLON
         { $$ = create_print_node(create_string_node($3), NULL); }
     | PRINT LPAREN STRING COMMA print_arg_list RPAREN SEMICOLON
         { $$ = create_print_node(create_string_node($3), $5); }
     ;
 
 print_arg_list:
-      expression { $$ = $1; }
-    | expression COMMA print_arg_list { $$ = create_list_node($1, $3); }
-
+    expression { $$ = $1; }
+    | expression COMMA print_arg_list { 
+        // Create right-nested structure for print arguments
+        $$ = create_list_node($1, $3); 
+    }
     ;
-
 
 scan_stmt:
     SCAN LPAREN STRING COMMA scan_arg_list RPAREN SEMICOLON
         { $$ = create_scan_node(create_string_node($3), $5); }
     ;
 
-
 scan_arg_list:
-      IDENTIFIER { $$ = create_identifier_node($1); }
-    | IDENTIFIER COMMA scan_arg_list { $$ = create_list_node(create_identifier_node($1), $3); }
+    IDENTIFIER { $$ = create_identifier_node($1); }
+    | IDENTIFIER COMMA scan_arg_list { 
+        // Create right-nested structure for scan arguments
+        $$ = create_list_node(create_identifier_node($1), $3); 
+    }
     ;
 
 block:
-      BEGIN_TOK statement_list END_TOK { $$ = create_block_node($2); }
+    BEGIN_TOK statement_list END_TOK { $$ = create_block_node($2); }
     | statement { $$ = $1; }
     ;
 
@@ -202,7 +211,7 @@ void yyerror(const char* s) {
 }
 
 int main(int argc, char *argv[]) {
-    yydebug=1;
+    //yydebug=1;
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <input file>\n", argv[0]);
         return 1;

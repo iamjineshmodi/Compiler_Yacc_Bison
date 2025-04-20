@@ -25,9 +25,22 @@ ASTNode* create_char_const_node(char value) {
 }
 
 ASTNode* create_string_node(char* value) {
+    // Allocate memory for the modified string (without spaces)
+    char* no_spaces = (char*)malloc(strlen(value) + 1); // +1 for '\0'
+    int j = 0;
+
+    for (int i = 0; value[i] != '\0'; ++i) {
+        if (value[i] != ' ') {
+            no_spaces[j++] = value[i];
+        }
+    }
+
+    no_spaces[j] = '\0'; // Null-terminate the string
+
     ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     node->type = STRING_NODE;
-    node->data.strval = strdup(value);
+    node->data.strval = no_spaces;
+
     return node;
 }
 
@@ -132,12 +145,9 @@ ASTNode* create_list_node(ASTNode* head, ASTNode* tail) {
     node->data.list.tail = tail;
     return node;
 }
-
 /* Print AST in generalized list form */
 void print_ast(ASTNode* node, int indent) {
     if (node == NULL) return;
-    
-    int i;
     
     switch (node->type) {
         case INT_CONST_NODE:
@@ -193,52 +203,37 @@ void print_ast(ASTNode* node, int indent) {
             printf(")");
             break;
         case IF_NODE:
-            printf("(if\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.if_stmt.condition, indent+2);
-            printf("\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.if_stmt.if_block, indent+2);
+            printf("(if ");
+            print_ast(node->data.if_stmt.condition, indent);
+            printf(" ");
+            print_ast(node->data.if_stmt.if_block, indent);
             if (node->data.if_stmt.else_block != NULL) {
-                printf("\n");
-                for (i = 0; i < indent+2; i++) printf(" ");
-                print_ast(node->data.if_stmt.else_block, indent+2);
+                printf(" ");
+                print_ast(node->data.if_stmt.else_block, indent);
             }
-            printf("\n");
-            for (i = 0; i < indent; i++) printf(" ");
             printf(")");
             break;
         case WHILE_NODE:
             printf("(while ");
             print_ast(node->data.while_loop.condition, indent);
-            printf("\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.while_loop.body, indent+2);
-            printf("\n");
-            for (i = 0; i < indent; i++) printf(" ");
+            printf(" ");
+            print_ast(node->data.while_loop.body, indent);
             printf(")");
             break;
         case FOR_NODE:
-            printf("(for\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.for_loop.init, indent+2);
-            printf("\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.for_loop.limit, indent+2);
-            printf("\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
+            printf("(for ");
+            print_ast(node->data.for_loop.init, indent);
+            printf(" ");
+            print_ast(node->data.for_loop.limit, indent);
+            printf(" ");
             if (node->data.for_loop.inc_or_dec == INC) {
                 printf("(inc ");
             } else {
                 printf("(dec ");
             }
-            print_ast(node->data.for_loop.step, indent+2);
-            printf(")");
-            printf("\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.for_loop.body, indent+2);
-            printf("\n");
-            for (i = 0; i < indent; i++) printf(" ");
+            print_ast(node->data.for_loop.step, indent);
+            printf(") ");
+            print_ast(node->data.for_loop.body, indent);
             printf(")");
             break;
         case PRINT_NODE:
@@ -257,24 +252,17 @@ void print_ast(ASTNode* node, int indent) {
             break;
         case PROGRAM_NODE:
         case LIST_NODE:
-            printf("(\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.list.head, indent+2);
+            printf("(");
+            print_ast(node->data.list.head, indent);
             if (node->data.list.tail != NULL) {
-                printf("\n");
-                for (i = 0; i < indent+2; i++) printf(" ");
-                print_ast(node->data.list.tail, indent+2);
+                printf(" ");
+                print_ast(node->data.list.tail, indent);
             }
-            printf("\n");
-            for (i = 0; i < indent; i++) printf(" ");
             printf(")");
             break;
         case BLOCK_NODE:
-            printf("(\n");
-            for (i = 0; i < indent+2; i++) printf(" ");
-            print_ast(node->data.list.head, indent+2);
-            printf("\n");
-            for (i = 0; i < indent; i++) printf(" ");
+            printf("(");
+            print_ast(node->data.list.head, indent);
             printf(")");
             break;
     }
