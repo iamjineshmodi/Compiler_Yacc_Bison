@@ -16,3 +16,5 @@ text = " <here> "
 ```
 python3 parser.py
 ```
+
+Update: Added Makefile
